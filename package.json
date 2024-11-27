@@ -1,5 +1,5 @@
 {
-  "name": "pdf-render",
+  "name": "pdf-to-image",
   "version": "0.1.0",
   "private": true,
   "scripts": {
