@@ -1,5 +1,8 @@
+'use client'
+
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+import { PDFDocumentProxy } from 'pdfjs-dist'
 
 type ExportFormat = 'png' | 'jpeg'
 const availableExportFormats: ExportFormat[] = ['png', 'jpeg']
@@ -21,6 +24,8 @@ const availableExportResolutionGroups: ExportResolutionGroup[] = [
 ]
 
 type PdfStoreState = {
+  isDocumentLoading: boolean
+  document: PDFDocumentProxy | null
   pageCount: number
   selectedPages: Set<number>
   exportResolution: ExportResolution
@@ -30,7 +35,8 @@ type PdfStoreState = {
 }
 
 type PdfStoreActions = {
-  setPageCount(newPageCount: number): void
+  setIsDocumentLoading: (isLoading: boolean) => void
+  setDocument(newDocument: PDFDocumentProxy | null): void
   setSelectedPages(newSelectedPages: Set<number>): void
   setExportResolution(newExportResolution: ExportResolution): void
   setExportFormat(newExportFormat: ExportFormat): void
@@ -40,12 +46,27 @@ type PdfStore = PdfStoreState & PdfStoreActions
 
 const usePdfStore = create<PdfStore>()(
   immer((set) => ({
-    pageCount: 0,
-    setPageCount: (newPageCount) => {
+    isDocumentLoading: false,
+    setIsDocumentLoading: (newIsLoading) => {
       set((state) => {
-        state.pageCount = newPageCount
+        state.isDocumentLoading = newIsLoading
       })
     },
+    document: null,
+    setDocument: (newDocument: PDFDocumentProxy | null) => {
+      set((state) => {
+        // @ts-expect-error Due to PDFDocumentProxy and WritableDraft<PDFDocumentProxy> incompatibility
+        state.document = newDocument
+
+        if (newDocument) {
+          state.pageCount = newDocument.numPages
+        } else {
+          state.pageCount = 0
+        }
+        state.isDocumentLoading = false
+      })
+    },
+    pageCount: 0,
     selectedPages: new Set<number>(),
     setSelectedPages: (newSelectedPages) => {
       set((state) => {
