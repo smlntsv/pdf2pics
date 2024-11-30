@@ -2,18 +2,16 @@ import { cn } from '@/lib/utils'
 import { Download, X } from 'lucide-react'
 import { ToolbarButton } from '@/components/ui/toolbar_button'
 import { FC } from 'react'
+import { usePdfStore } from '@/stores/usePdfStore'
 
 interface ToolbarProps {
   selectedPages: number
   onExportSelectedClicked: () => void
-  onClearSelectionClicked: () => void
 }
 
-const Toolbar: FC<ToolbarProps> = ({
-  selectedPages = 0,
-  onExportSelectedClicked,
-  onClearSelectionClicked,
-}) => {
+const Toolbar: FC<ToolbarProps> = ({ onExportSelectedClicked }) => {
+  const { selectedPages, setSelectedPages } = usePdfStore()
+
   return (
     <div className={cn('fixed w-full max-w-6xl bottom-4 right-0 left-0 px-4 mx-auto')}>
       <div
@@ -28,9 +26,9 @@ const Toolbar: FC<ToolbarProps> = ({
           Export Selected
         </ToolbarButton>
         <p className={'text-gray-500 dark:text-white'}>
-          Selected: <span className="font-bold">{selectedPages}</span>
+          Selected: <span className="font-bold">{selectedPages.size}</span>
         </p>
-        <ToolbarButton onClick={onClearSelectionClicked}>
+        <ToolbarButton onClick={setSelectedPages.bind(null, new Set())}>
           Clear Selection
           <X className={'ml-2'} />
         </ToolbarButton>
