@@ -5,7 +5,6 @@ import { FC } from 'react'
 import { usePdfStore } from '@/stores/usePdfStore'
 
 interface ToolbarProps {
-  selectedPages: number
   onExportSelectedClicked: () => void
 }
 
@@ -25,7 +24,7 @@ const Toolbar: FC<ToolbarProps> = ({ onExportSelectedClicked }) => {
           <Download className={'mr-2'} />
           Export Selected
         </ToolbarButton>
-        <p className={'text-gray-500 dark:text-white'}>
+        <p className={'text-gray-500 dark:text-white text-center'}>
           Selected: <span className="font-bold">{selectedPages.size}</span>
         </p>
         <ToolbarButton onClick={setSelectedPages.bind(null, new Set())}>
