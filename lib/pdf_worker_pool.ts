@@ -1,12 +1,25 @@
 export type PDFTaskData =
   | { type: 'loadDocument'; documentBuffer: SharedArrayBuffer }
   | { type: 'renderPage'; pageNumber: number; scale: number }
+  | { type: 'getPageSize'; pageNumber: number; scale: number }
 
 export type PDFTaskDataWithId = { id: number } & PDFTaskData
 
 export type PDFWorkerResponseData =
   | { type: 'documentLoaded'; pageCount: number }
-  | { type: 'pageRendered'; pageNumber: number; pageImageArrayBuffer: ArrayBuffer }
+  | {
+      type: 'pageRendered'
+      pageNumber: number
+      pageImageArrayBuffer: ArrayBuffer
+      width: number
+      height: number
+    }
+  | {
+      type: 'pageSizeRetrieved'
+      pageNumber: number
+      width: number
+      height: number
+    }
   | { type: 'error'; errorMessage: string }
 
 export type PDFWorkerResponseDataWithId = { id: number; workerName: string } & PDFWorkerResponseData
@@ -24,7 +37,7 @@ function isReadyMessage(data: unknown): data is WorkerReadyMessageType {
 
 class PDFWorkerPool {
   #autoIncrement: number = 0
-  #poolSize: number
+  readonly #poolSize: number
   #workers: Worker[] = []
   #taskQueue: PDFTaskDataWithId[] = []
   #taskPromises: Map<
@@ -48,7 +61,7 @@ class PDFWorkerPool {
 
     // Initialize the pool with workers
     for (let i = 0; i < this.#poolSize; i++) {
-      const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+      const worker = new Worker(new URL('./worker', import.meta.url), {
         name: `Worker ${i + 1}`,
       })
       this.#workers.push(worker)
@@ -79,7 +92,7 @@ class PDFWorkerPool {
     }
   }
 
-  async initializeDocument(documentSharedArrayBuffer: SharedArrayBuffer): Promise<number[]> {
+  async initializeDocument(documentBuffer: SharedArrayBuffer): Promise<number[]> {
     const promises = this.#workers.map(
       (worker: Worker) =>
         new Promise<number>((resolve) => {
@@ -94,7 +107,7 @@ class PDFWorkerPool {
           worker.postMessage({
             id: Number.MAX_SAFE_INTEGER,
             type: 'loadDocument',
-            documentBuffer: documentSharedArrayBuffer,
+            documentBuffer,
           } as PDFTaskDataWithId)
         })
     )
@@ -108,6 +121,22 @@ class PDFWorkerPool {
       const taskData: PDFTaskDataWithId = {
         id: this.#autoIncrement++ + 1,
         type: 'renderPage',
+        pageNumber,
+        scale,
+      }
+
+      this.#taskPromises.set(taskData.id, { resolve, reject })
+      this.#taskQueue.push(taskData)
+
+      this.#processNextTask()
+    })
+  }
+
+  async getPageSize(pageNumber: number, scale: number = 1): Promise<PDFWorkerResponseData> {
+    return new Promise((resolve, reject) => {
+      const taskData: PDFTaskDataWithId = {
+        id: this.#autoIncrement++ + 1,
+        type: 'getPageSize',
         pageNumber,
         scale,
       }

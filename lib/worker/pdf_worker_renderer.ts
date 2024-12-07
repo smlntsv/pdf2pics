@@ -1,5 +1,5 @@
 import { getDocument, PDFDocumentProxy, GlobalWorkerOptions } from 'pdfjs-dist'
-import { OffscreenCanvasFactory } from '@/lib/offscreen_canvas_factory'
+import { OffscreenCanvasFactory } from '@/lib/worker/offscreen_canvas_factory'
 
 GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -25,7 +25,7 @@ class PDFWorkerRenderer {
     return this.#documentProxy.numPages
   }
 
-  async loadDocument(documentData: SharedArrayBuffer) {
+  async loadDocument(documentData: SharedArrayBuffer): Promise<void> {
     const data = new Uint8Array(documentData)
 
     const loadingTask = getDocument({
@@ -34,7 +34,8 @@ class PDFWorkerRenderer {
       // disableRange: true,
       // disableStream: true,
       // disableAutoFetch: true,
-      // disableFontFace: true,
+      disableFontFace: true, // To render fonts
+      verbosity: 0, // Hide unnecessary messages
     })
 
     this.#documentProxy = await loadingTask.promise
@@ -46,7 +47,14 @@ class PDFWorkerRenderer {
    * @param scale - Scaling factor for rendering.
    * @returns A promise resolving to the rendered page's ArrayBuffer
    */
-  async renderPage(pageNumber: number, scale: number): Promise<ArrayBuffer> {
+  async renderPage(
+    pageNumber: number,
+    scale: number
+  ): Promise<{
+    arrayBuffer: ArrayBuffer
+    width: number
+    height: number
+  }> {
     // Validate input
     if (!this.#documentProxy) {
       throw new Error('DocumentProxy is not ready.')
@@ -82,8 +90,43 @@ class PDFWorkerRenderer {
       intent: 'print',
     }).promise
 
+    const convertOptions: ImageEncodeOptions = {
+      type: 'image/png',
+      quality: 1,
+    }
+
     // Convert canvas content to ArrayBuffer
-    return (await this.#canvas.convertToBlob()).arrayBuffer()
+    const arrayBuffer = await (await this.#canvas.convertToBlob(convertOptions)).arrayBuffer()
+
+    return {
+      arrayBuffer,
+      width: viewport.width,
+      height: viewport.height,
+    }
+  }
+
+  async getPageSize(
+    pageNumber: number,
+    scale: number = 1.0
+  ): Promise<{
+    width: number
+    height: number
+  }> {
+    // Validate input
+    if (!this.#documentProxy) {
+      throw new Error('DocumentProxy is not ready.')
+    }
+    if (pageNumber <= 0 || pageNumber > this.#documentProxy.numPages) {
+      throw new Error('Page number is out of range.')
+    }
+
+    const pageProxy = await this.#documentProxy.getPage(pageNumber)
+    const viewport = pageProxy.getViewport({ scale })
+
+    return {
+      height: viewport.height,
+      width: viewport.width,
+    }
   }
 }
 
