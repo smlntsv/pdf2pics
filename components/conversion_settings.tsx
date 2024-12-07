@@ -1,37 +1,44 @@
-import { FC, useMemo } from 'react'
-import { ExportFormat, ExportResolution, usePdfStore } from '@/stores/usePdfStore'
+import { FC } from 'react'
+import { usePdfStore } from '@/stores/usePdfStore'
 import { NativeSelect } from '@/components/ui/native_select'
 
+type Option<T> = {
+  label: string
+  value: T
+}
+
+export type ExportFormat = 'image/png' | 'image/jpeg'
+
+const EXPORT_FORMAT_OPTIONS: Option<ExportFormat>[] = [
+  {
+    label: 'PNG',
+    value: 'image/png',
+  },
+  {
+    label: 'JPEG',
+    value: 'image/jpeg',
+  },
+]
+
+export type ExportResolution = '1920x1080' | '1280x720' | '800x600' //(typeof EXPORT_RESOLUTION_OPTIONS)[number]['value']
+
+const EXPORT_RESOLUTION_OPTIONS: Option<ExportResolution>[] = [
+  {
+    label: '1920x1080 or 1080x1920',
+    value: '1920x1080',
+  },
+  {
+    label: '1280x720 or 720x1280',
+    value: '1280x720',
+  },
+  {
+    label: '800x600 or 600x800',
+    value: '800x600',
+  },
+]
+
 const ConversionSettings: FC = () => {
-  const {
-    exportResolution,
-    availableExportResolutionGroups,
-    setExportResolution,
-    exportFormat,
-    availableExportFormats,
-    setExportFormat,
-  } = usePdfStore()
-
-  const exportResolutionOptions = useMemo(
-    () =>
-      availableExportResolutionGroups.map(({ group, resolutions }) => ({
-        label: group,
-        options: resolutions.map((resolution) => ({
-          value: resolution,
-          label: resolution,
-        })),
-      })),
-    [availableExportResolutionGroups]
-  )
-
-  const exportFormatOptions = useMemo(
-    () =>
-      availableExportFormats.map((format) => ({
-        label: format.toUpperCase(),
-        value: format,
-      })),
-    [availableExportFormats]
-  )
+  const { exportResolution, setExportResolution, exportFormat, setExportFormat } = usePdfStore()
 
   return (
     <fieldset
@@ -43,7 +50,7 @@ const ConversionSettings: FC = () => {
         <div className={'flex flex-col w-full'}>
           <span className={' text-gray-500 dark:text-gray-300'}>Resolution</span>
           <NativeSelect
-            options={exportResolutionOptions}
+            options={EXPORT_RESOLUTION_OPTIONS}
             value={exportResolution}
             onChange={(e) => setExportResolution(e.target.value as ExportResolution)}
           />
@@ -54,7 +61,7 @@ const ConversionSettings: FC = () => {
           <span className={' text-gray-500 dark:text-gray-300'}>Format</span>
           {/* 'Select a format' */}
           <NativeSelect
-            options={exportFormatOptions}
+            options={EXPORT_FORMAT_OPTIONS}
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
           />

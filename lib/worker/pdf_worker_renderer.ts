@@ -1,5 +1,6 @@
 import { getDocument, PDFDocumentProxy, GlobalWorkerOptions } from 'pdfjs-dist'
 import { OffscreenCanvasFactory } from '@/lib/worker/offscreen_canvas_factory'
+import { ExportFormat } from '@/components/conversion_settings'
 
 GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -52,7 +53,7 @@ class PDFWorkerRenderer {
   async renderPage(
     pageNumber: number,
     scale: number,
-    format: 'image/png' | 'image/jpeg',
+    format: ExportFormat,
     quality: number
   ): Promise<{
     arrayBuffer: ArrayBuffer

@@ -4,6 +4,7 @@ import { FC } from 'react'
 import { usePdfStore } from '@/stores/usePdfStore'
 import { motion } from 'motion/react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface Props {
   onClose: () => void
@@ -22,7 +23,7 @@ const PageHighResPreview: FC<Props> = ({ onClose }) => {
         layoutId={`img-${previewPageNumber?.toString()}`}
       >
         {previewImageData && (
-          <img
+          <Image
             width={previewImageData.width}
             height={previewImageData.height}
             src={previewImageData.objectURL}

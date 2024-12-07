@@ -6,8 +6,7 @@ import { PDFImageData, usePdfStore } from '@/stores/usePdfStore'
 import { LoaderCircle } from 'lucide-react'
 import { PDFWorkerPool } from '@/lib/pdf_worker_pool'
 import { toast } from '@/hooks/use-toast'
-
-const PAGE_THUMBNAIL_SCALE = 0.8
+import { PAGE_THUMBNAIL_SCALE } from '@/lib/constants'
 
 interface Props {
   pageNumber: number
@@ -17,22 +16,20 @@ interface Props {
 const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   const {
     selectedPages,
-    previewIsVisible,
     previewPageNumber,
     pdfWorkerPool,
     setPreviewPageNumber,
-    setPreviewIsVisible,
     setPreviewImageData,
   } = usePdfStore()
 
   const isSelected = selectedPages.has(pageNumber)
-  const inPreview = pageNumber === previewPageNumber && previewIsVisible
+  const inPreview = pageNumber === previewPageNumber
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [alreadyInLine, setAlreadyInLine] = useState<boolean>(false)
-  // const [imageObjectURL, setImageObjectURL] = useState<string | null>(null)
   const [imageData, setImageData] = useState<PDFImageData | null>(null)
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false)
+  const isLoading = !imageData || isPreviewLoading
 
   const renderPage = useCallback(
     (
@@ -69,17 +66,16 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
         return
       }
       setIsPreviewLoading(true)
-      setPreviewPageNumber(pageNumber)
       const previewImageData = await renderPage(
         pdfWorkerPool,
         pageNumber,
         window.devicePixelRatio || 1
       )
       setPreviewImageData(previewImageData)
+      setPreviewPageNumber(pageNumber)
       setIsPreviewLoading(false)
-      setPreviewIsVisible(true)
     },
-    [pdfWorkerPool, renderPage, setPreviewImageData, setPreviewIsVisible, setPreviewPageNumber]
+    [pdfWorkerPool, renderPage, setPreviewImageData, setPreviewPageNumber]
   )
 
   const onLongPressStart = useCallback(
@@ -99,7 +95,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
     }
   }, [])
 
-  // Add page to render queue when it becomes visible
+  // Render preview when it becomes visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -107,12 +103,12 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
           renderPage(pdfWorkerPool, pageNumber, PAGE_THUMBNAIL_SCALE)
             .then((imageData) => setImageData(imageData))
             .catch((error) => {
-              console.error(error)
               toast({
                 title: 'Error',
                 description: `Failed to render page thumbnail.`,
                 variant: 'destructive',
               })
+              console.error(error)
             })
           setAlreadyInLine(true)
         }
@@ -128,15 +124,19 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   }, [pageNumber, alreadyInLine, pdfWorkerPool, renderPage])
 
   return (
-    <div
+    <motion.div
       ref={containerRef}
       className={cn(
         'flex items-center justify-center',
         'relative bg-white rounded-lg border',
         'hover:shadow-lg cursor-pointer',
-        isSelected ? 'border-blue-500' : 'border-gray-300',
+        isSelected ? 'border-blue-500' : 'border-gray-200',
         !imageData && 'aspect-[8.5/11]'
       )}
+      initial={{ scale: 1 }}
+      whileHover={{ scale: 0.98 }}
+      whileTap={{ scale: 0.95, transition: { duration: 0.2 } }}
+      transition={{ duration: 0.4 }}
       onClick={(e: MouseEvent) => onClick(pageNumber, e.shiftKey)}
       onMouseDown={onLongPressStart.bind(null, pageNumber)}
       onMouseUp={onLongPressEnd}
@@ -145,12 +145,12 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       onTouchEnd={onLongPressEnd}
     >
       {/* Checkbox */}
-      <div className={cn('absolute top-2 right-2', inPreview && 'hidden')}>
+      <div className={cn('absolute top-2 right-2', inPreview || (isLoading && 'hidden'))}>
         <CheckboxIcon isSelected={isSelected} />
       </div>
 
       {/* Loading icon */}
-      {isPreviewLoading && (
+      {isLoading && (
         <div
           className={
             'absolute backdrop-blur-sm rounded-md  flex w-full h-full items-center justify-center'
@@ -161,13 +161,9 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       )}
 
       {/* Page image */}
-      {!imageData ? (
-        <div className={'flex w-full h-full items-center justify-center'}>
-          <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
-        </div>
-      ) : (
+      {!isLoading && (
         <motion.img
-          className={'rounded-lg'}
+          className={'rounded-lg pointer-events-none'}
           layoutId={`img-${pageNumber.toString()}`}
           alt={`Page ${pageNumber}`}
           width={imageData.width}
@@ -179,13 +175,14 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       {/* Page number */}
       <p
         className={cn(
-          'absolute left-2 bottom-2 flex  bg-white text-gray-500 px-3 py-1 rounded-full border',
-          inPreview && 'hidden'
+          'absolute left-2 bottom-2 px-3 py-1 bg-white text-gray-500 rounded-full border',
+          'text-sm',
+          isLoading && 'hidden'
         )}
       >
         Page {pageNumber}
       </p>
-    </div>
+    </motion.div>
   )
 }
 

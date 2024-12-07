@@ -18,8 +18,8 @@ const PagesSelector: FC<PagesSelectorProps> = ({ className }) => {
     setSelectedPages,
     lastSelectedPages,
     setLastSelectedPages,
-    previewIsVisible,
-    setPreviewIsVisible,
+    previewPageNumber,
+    setPreviewPageNumber,
   } = usePdfStore()
 
   const onPageClick = useCallback(
@@ -59,14 +59,9 @@ const PagesSelector: FC<PagesSelectorProps> = ({ className }) => {
     [lastSelectedPages, selectedPages, setLastSelectedPages, setSelectedPages]
   )
 
-  const onHighResPreviewClose = () => {
-    setPreviewIsVisible(false)
-  }
-
-  // Prevent scroll when overlay is visible
-  // useEffect(() => {
-  //   document.body.style.overflow = previewIsVisible > 0 ? 'hidden' : 'auto'
-  // }, [previewIsVisible])
+  const onHighResPreviewClose = useCallback(() => {
+    setPreviewPageNumber(0)
+  }, [setPreviewPageNumber])
 
   return (
     <div
@@ -84,8 +79,8 @@ const PagesSelector: FC<PagesSelectorProps> = ({ className }) => {
       ))}
 
       {/* High-Res Preview */}
-      <AnimatePresence mode={'wait'}>
-        {previewIsVisible && <PageHighResPreview onClose={onHighResPreviewClose} />}
+      <AnimatePresence>
+        {previewPageNumber > 0 && <PageHighResPreview onClose={onHighResPreviewClose} />}
       </AnimatePresence>
     </div>
   )

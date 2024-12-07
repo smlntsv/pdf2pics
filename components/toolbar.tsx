@@ -12,19 +12,20 @@ const Toolbar: FC<ToolbarProps> = ({ onExportSelectedClicked }) => {
   const { selectedPages, setSelectedPages } = usePdfStore()
 
   return (
-    <div className={cn('fixed w-full max-w-6xl bottom-4 right-0 left-0 px-4 mx-auto')}>
+    <div className={cn('sticky mt-6 w-full max-w-6xl bottom-4 right-0 left-0 mx-auto')}>
       <div
         className={cn(
           'flex justify-between items-center rounded-lg',
           'bg-white dark:bg-gray-500 dark:text-white',
-          'border border-gray-100 shadow-sm dark:border-gray-500'
+          'border border-gray-200  dark:border-gray-500',
+          'text-sm'
         )}
       >
         <ToolbarButton onClick={onExportSelectedClicked}>
           <Download className={'mr-2'} />
           Export Selected
         </ToolbarButton>
-        <p className={'text-gray-500 dark:text-white text-center'}>
+        <p className={'text-center'}>
           Selected: <span className="font-bold">{selectedPages.size}</span>
         </p>
         <ToolbarButton onClick={setSelectedPages.bind(null, new Set())}>

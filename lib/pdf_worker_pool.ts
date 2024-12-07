@@ -1,10 +1,12 @@
+import { ExportFormat } from '@/components/conversion_settings'
+
 export type PDFTaskData =
   | { type: 'loadDocument'; documentBuffer: SharedArrayBuffer }
   | {
       type: 'renderPage'
       pageNumber: number
       scale: number
-      format: 'image/png' | 'image/jpeg'
+      format: ExportFormat
       quality: number
     }
   | { type: 'getPageSize'; pageNumber: number; scale: number }
@@ -19,7 +21,7 @@ export type PDFWorkerResponseData =
       pageImageArrayBuffer: ArrayBuffer
       width: number
       height: number
-      format: 'image/png' | 'image/jpeg'
+      format: ExportFormat
       quality: number
     }
   | {
@@ -127,7 +129,7 @@ class PDFWorkerPool {
   renderPage(
     pageNumber: number,
     scale: number = 1,
-    format: 'image/png' | 'image/jpeg' = 'image/png',
+    format: ExportFormat = 'image/png',
     quality: number = 1
   ): Promise<PDFWorkerResponseData> {
     return new Promise((resolve, reject) => {
