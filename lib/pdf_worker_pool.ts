@@ -1,6 +1,12 @@
 export type PDFTaskData =
   | { type: 'loadDocument'; documentBuffer: SharedArrayBuffer }
-  | { type: 'renderPage'; pageNumber: number; scale: number }
+  | {
+      type: 'renderPage'
+      pageNumber: number
+      scale: number
+      format: 'image/png' | 'image/jpeg'
+      quality: number
+    }
   | { type: 'getPageSize'; pageNumber: number; scale: number }
 
 export type PDFTaskDataWithId = { id: number } & PDFTaskData
@@ -13,6 +19,8 @@ export type PDFWorkerResponseData =
       pageImageArrayBuffer: ArrayBuffer
       width: number
       height: number
+      format: 'image/png' | 'image/jpeg'
+      quality: number
     }
   | {
       type: 'pageSizeRetrieved'
@@ -116,13 +124,20 @@ class PDFWorkerPool {
   }
 
   // Enqueue new task
-  renderPage(pageNumber: number, scale: number): Promise<PDFWorkerResponseData> {
+  renderPage(
+    pageNumber: number,
+    scale: number = 1,
+    format: 'image/png' | 'image/jpeg' = 'image/png',
+    quality: number = 1
+  ): Promise<PDFWorkerResponseData> {
     return new Promise((resolve, reject) => {
       const taskData: PDFTaskDataWithId = {
         id: this.#autoIncrement++ + 1,
         type: 'renderPage',
         pageNumber,
         scale,
+        format,
+        quality,
       }
 
       this.#taskPromises.set(taskData.id, { resolve, reject })
@@ -132,6 +147,11 @@ class PDFWorkerPool {
     })
   }
 
+  /**
+   * Get size of the page.
+   * @param pageNumber
+   * @param scale
+   */
   async getPageSize(pageNumber: number, scale: number = 1): Promise<PDFWorkerResponseData> {
     return new Promise((resolve, reject) => {
       const taskData: PDFTaskDataWithId = {

@@ -45,11 +45,15 @@ class PDFWorkerRenderer {
    * Render a specific page of a PDF document to an OffscreenCanvas and returns the rendered page as an ArrayBuffer.
    * @param pageNumber - Page number to render (1-based index).
    * @param scale - Scaling factor for rendering.
+   * @param format - Image format: PNG/JPEG.
+   * @param quality - Rendered image quality (0 - 1)
    * @returns A promise resolving to the rendered page's ArrayBuffer
    */
   async renderPage(
     pageNumber: number,
-    scale: number
+    scale: number,
+    format: 'image/png' | 'image/jpeg',
+    quality: number
   ): Promise<{
     arrayBuffer: ArrayBuffer
     width: number
@@ -90,13 +94,13 @@ class PDFWorkerRenderer {
       intent: 'print',
     }).promise
 
-    const convertOptions: ImageEncodeOptions = {
-      type: 'image/png',
-      quality: 1,
-    }
-
     // Convert canvas content to ArrayBuffer
-    const arrayBuffer = await (await this.#canvas.convertToBlob(convertOptions)).arrayBuffer()
+    const arrayBuffer = await (
+      await this.#canvas.convertToBlob({
+        type: format,
+        quality,
+      })
+    ).arrayBuffer()
 
     return {
       arrayBuffer,

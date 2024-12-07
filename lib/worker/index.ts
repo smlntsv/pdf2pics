@@ -30,7 +30,9 @@ workerSelf.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>
       try {
         const { arrayBuffer, width, height } = await pdfWorkerRenderer.renderPage(
           data.pageNumber,
-          data.scale
+          data.scale,
+          data.format,
+          data.quality
         )
         workerSelf.postMessage(
           {
@@ -40,6 +42,8 @@ workerSelf.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>
             pageImageArrayBuffer: arrayBuffer,
             width,
             height,
+            format: data.format,
+            quality: data.quality,
             workerName: workerSelf.name,
           } as PDFWorkerResponseDataWithId,
           [arrayBuffer] // transfer
