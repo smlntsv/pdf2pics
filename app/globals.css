@@ -6,6 +6,19 @@ body {
   font-family: ui-sans-serif, -apple-system, system-ui, sans-serif;
 }
 
+/* Select Arrow */
+select:not([size]) {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 10 6'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 1 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right .75rem center;
+  background-repeat: no-repeat;
+  background-size: .75em .75em;
+  padding-right: 2.5rem;
+  /* appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -26,7 +39,7 @@ body {
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
+    --ring: 246, 10%, 85%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
