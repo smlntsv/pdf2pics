@@ -7,8 +7,9 @@ import { cn } from '@/lib/utils'
 import { ThemeProvider } from '@/components/theme_provider'
 
 export const metadata: Metadata = {
-  title: 'PDF to IMG',
-  description: 'Convert PDF to Images',
+  title: 'PDF to Pics',
+  description:
+    'Easily convert PDF files to high-quality images with PDF to Pics. This secure PWA works offline, ensuring fast, private, and reliable conversions—all directly in your browser without uploading files to a server.',
 }
 
 export default function RootLayout({

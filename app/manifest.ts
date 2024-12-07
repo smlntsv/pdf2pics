@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'PDF to IMG',
+    name: 'PDF to Pics',
     orientation: 'any',
-    short_name: 'PDF2IMG',
-    description: 'Convert PDF to Images',
+    short_name: 'PDF2PICS',
+    description: 'Convert PDFs to Pictures effortlessly',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
@@ -25,14 +25,14 @@ export default function manifest(): MetadataRoute.Manifest {
     screenshots: [
       {
         form_factor: 'wide',
-        label: 'Home screen showing main UI for PDF to IMG conversion',
+        label: 'Home screen showcasing the main interface for converting PDFs to images',
         src: 'img/screenshots/home-1280x720.png',
         type: 'image/png',
         sizes: '1280x720',
       },
       {
         form_factor: 'narrow',
-        label: 'Home screen showing main UI for PDF to IMG conversion',
+        label: 'Home screen showcasing the main interface for converting PDFs to images',
         src: 'img/screenshots/home-720x1280.png',
         type: 'image/png',
         sizes: '720x1280',
