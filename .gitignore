@@ -42,3 +42,5 @@ next-env.d.ts
 
 # WebStorm configuration files
 /.idea
+
+certificates
