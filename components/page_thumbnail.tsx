@@ -61,7 +61,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       if (!pdfWorkerPool) {
         toast({
           title: 'Error',
-          description: 'Renderer is not ready yet',
+          description: 'The renderer is not ready yet.',
         })
         return
       }
@@ -125,14 +125,14 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       ref={containerRef}
       className={cn(
         'flex items-center justify-center',
-        'relative bg-white rounded-lg border',
+        'relative bg-white dark:bg-gray-600 rounded-lg border',
         'hover:shadow-lg cursor-pointer',
-        isSelected ? 'border-blue-500' : 'border-gray-200',
+        isSelected ? 'border-blue-500' : 'border-gray-200 dark:border-gray-600',
         !imageData && 'aspect-[8.5/11]'
       )}
       initial={{ scale: 1 }}
       whileHover={{ scale: 0.98 }}
-      whileTap={{ scale: 0.95, transition: { duration: 0.2 } }}
+      whileTap={{ scale: 0.9, transition: { duration: 0.2 } }}
       transition={{ duration: 0.4 }}
       onClick={(e: MouseEvent) => onClick(pageNumber, e.shiftKey)}
       onMouseDown={onLongPressStart.bind(null, pageNumber)}
@@ -140,6 +140,8 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       onMouseLeave={onLongPressEnd}
       onTouchStart={onLongPressStart.bind(null, pageNumber)}
       onTouchEnd={onLongPressEnd}
+      onTouchCancel={onLongPressEnd}
+      onTouchMove={onLongPressEnd}
     >
       {/* Checkbox */}
       <div className={cn('absolute top-2 right-2', inPreview || (isLoading && 'hidden'))}>
