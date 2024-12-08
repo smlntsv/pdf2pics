@@ -66,11 +66,8 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
         return
       }
       setIsPreviewLoading(true)
-      const previewImageData = await renderPage(
-        pdfWorkerPool,
-        pageNumber,
-        window.devicePixelRatio || 1
-      )
+      const scale = window.devicePixelRatio || 1
+      const previewImageData = await renderPage(pdfWorkerPool, pageNumber, scale)
       setPreviewImageData(previewImageData)
       setPreviewPageNumber(pageNumber)
       setIsPreviewLoading(false)
@@ -161,7 +158,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       )}
 
       {/* Page image */}
-      {!isLoading && (
+      {imageData && (
         <motion.img
           className={'rounded-lg pointer-events-none'}
           layoutId={`img-${pageNumber.toString()}`}

@@ -20,20 +20,53 @@ const EXPORT_FORMAT_OPTIONS: Option<ExportFormat>[] = [
   },
 ]
 
-export type ExportResolution = '1920x1080' | '1280x720' | '800x600' //(typeof EXPORT_RESOLUTION_OPTIONS)[number]['value']
+export type ExportResolution =
+  | '2480x3508'
+  | '3508x4961'
+  | '1748x2480'
+  | '7680x4320'
+  | '3840x2160'
+  | '2560x1440'
+  | '2048x1080'
+  | '1920x1080'
+  | '1280x720'
 
 const EXPORT_RESOLUTION_OPTIONS: Option<ExportResolution>[] = [
   {
-    label: '1920x1080 or 1080x1920',
+    label: 'A4 at 300 DPI',
+    value: '2480x3508',
+  },
+  {
+    label: 'A3 at 300 DPI',
+    value: '3508x4961',
+  },
+  {
+    label: 'A5 at 300 DPI',
+    value: '1748x2480',
+  },
+  {
+    label: '8K Ultra HD',
+    value: '7680x4320',
+  },
+  {
+    label: '4K Ultra HD',
+    value: '3840x2160',
+  },
+  {
+    label: 'QHD (1440p)',
+    value: '2560x1440',
+  },
+  {
+    label: '2K',
+    value: '2048x1080',
+  },
+  {
+    label: 'Full HD (1080p)',
     value: '1920x1080',
   },
   {
-    label: '1280x720 or 720x1280',
+    label: 'HD (720p)',
     value: '1280x720',
-  },
-  {
-    label: '800x600 or 600x800',
-    value: '800x600',
   },
 ]
 
