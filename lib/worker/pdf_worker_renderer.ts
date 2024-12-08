@@ -20,7 +20,7 @@ class PDFWorkerRenderer {
 
   get pageCount(): number {
     if (this.#documentProxy == null) {
-      throw new Error('Document is not initialized.')
+      throw new Error('The document is not initialized.')
     }
 
     return this.#documentProxy.numPages
@@ -62,7 +62,7 @@ class PDFWorkerRenderer {
   }> {
     // Validate input
     if (!this.#documentProxy) {
-      throw new Error('DocumentProxy is not ready.')
+      throw new Error('The documentProxy is not ready.')
     }
     if (pageNumber <= 0 || pageNumber > this.#documentProxy.numPages) {
       throw new Error('Page number is out of range.')
@@ -119,7 +119,7 @@ class PDFWorkerRenderer {
   }> {
     // Validate input
     if (!this.#documentProxy) {
-      throw new Error('DocumentProxy is not ready.')
+      throw new Error('The documentProxy is not ready.')
     }
     if (pageNumber <= 0 || pageNumber > this.#documentProxy.numPages) {
       throw new Error('Page number is out of range.')

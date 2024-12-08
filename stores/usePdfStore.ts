@@ -2,89 +2,100 @@
 
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { PDFDocumentProxy } from 'pdfjs-dist'
+import { PDFWorkerPool } from '@/lib/pdf_worker_pool'
+import { ExportFormat, ExportResolution } from '@/components/conversion_settings'
 
-type ExportFormat = 'png' | 'jpeg'
-const availableExportFormats: ExportFormat[] = ['png', 'jpeg']
-
-type ExportResolution = '600x800' | '720x1280' | '1080x1920' | '800x600' | '1280x720' | '1920x1080'
-type ExportResolutionGroup = {
-  group: 'Portrait' | 'Landscape'
-  resolutions: ExportResolution[]
+// TODO: refactor?
+export type PDFImageData = {
+  objectURL: string
+  width: number
+  height: number
 }
-const availableExportResolutionGroups: ExportResolutionGroup[] = [
-  {
-    group: 'Portrait',
-    resolutions: ['600x800', '720x1280', '1080x1920'],
-  },
-  {
-    group: 'Landscape',
-    resolutions: ['800x600', '1280x720', '1920x1080'],
-  },
-]
 
 type PdfStoreState = {
-  isDocumentLoading: boolean
-  document: PDFDocumentProxy | null
+  selectedFileName: string | null
+  pdfWorkerPool: PDFWorkerPool | null
   pageCount: number
   selectedPages: Set<number>
+  lastSelectedPages: number[]
+  // Export settings
   exportResolution: ExportResolution
   exportFormat: ExportFormat
-  availableExportFormats: ExportFormat[]
-  availableExportResolutionGroups: ExportResolutionGroup[]
+  // Rendering
+  previewPageNumber: number
+  previewImageData: PDFImageData | null
 }
 
 type PdfStoreActions = {
-  setIsDocumentLoading: (isLoading: boolean) => void
-  setDocument(newDocument: PDFDocumentProxy | null): void
+  setSelectedFileName: (selectedFileName: string | null) => void
+  setPdfWorkerPool: (pdfWorkerPool: PDFWorkerPool) => void
+  setPageCount: (newCount: number) => void
   setSelectedPages(newSelectedPages: Set<number>): void
+  setLastSelectedPages: (newLastSelectedPages: number[]) => void
   setExportResolution(newExportResolution: ExportResolution): void
   setExportFormat(newExportFormat: ExportFormat): void
+  // Rendering
+  setPreviewPageNumber: (pageNumber: number) => void
+  setPreviewImageData: (imageData: PDFImageData | null) => void
 }
 
 type PdfStore = PdfStoreState & PdfStoreActions
 
 const usePdfStore = create<PdfStore>()(
   immer((set) => ({
-    isDocumentLoading: false,
-    setIsDocumentLoading: (newIsLoading) => {
+    selectedFileName: null,
+    setSelectedFileName: (selectedFileName: string | null) => {
       set((state) => {
-        state.isDocumentLoading = newIsLoading
+        state.selectedFileName = selectedFileName
       })
     },
-    document: null,
-    setDocument: (newDocument: PDFDocumentProxy | null) => {
+    pdfWorkerPool: null,
+    setPdfWorkerPool: (newPdfWorkerPool: PDFWorkerPool): void => {
       set((state) => {
-        // @ts-expect-error Due to PDFDocumentProxy and WritableDraft<PDFDocumentProxy> incompatibility
-        state.document = newDocument
-
-        if (newDocument) {
-          state.pageCount = newDocument.numPages
-        } else {
-          state.pageCount = 0
-        }
-        state.isDocumentLoading = false
+        state.pdfWorkerPool = newPdfWorkerPool
       })
     },
     pageCount: 0,
+    setPageCount: (newPageCount: number): void => {
+      set((state) => {
+        state.pageCount = newPageCount
+      })
+    },
     selectedPages: new Set<number>(),
-    setSelectedPages: (newSelectedPages) => {
+    setSelectedPages: (newSelectedPages: Set<number>) => {
       set((state) => {
         state.selectedPages = newSelectedPages
       })
     },
-    exportFormat: 'png',
-    availableExportFormats,
-    exportResolution: '1280x720',
-    availableExportResolutionGroups,
-    setExportFormat: (newExportFormat) => {
+    lastSelectedPages: [],
+    setLastSelectedPages: (newLastSelectedPages: number[]) => {
+      set((state) => {
+        state.lastSelectedPages = newLastSelectedPages
+      })
+    },
+    exportFormat: 'image/png',
+    exportResolution: '2480x3508',
+    setExportFormat: (newExportFormat: ExportFormat) => {
       set((state) => {
         state.exportFormat = newExportFormat
       })
     },
-    setExportResolution: (newExportResolution) => {
+    setExportResolution: (newExportResolution: ExportResolution) => {
       set((state) => {
         state.exportResolution = newExportResolution
+      })
+    },
+    // Rendering
+    previewPageNumber: 0,
+    setPreviewPageNumber: (pageNumber: number) => {
+      set((state) => {
+        state.previewPageNumber = pageNumber
+      })
+    },
+    previewImageData: null,
+    setPreviewImageData: (imageData: PDFImageData | null) => {
+      set((state) => {
+        state.previewImageData = imageData
       })
     },
   }))

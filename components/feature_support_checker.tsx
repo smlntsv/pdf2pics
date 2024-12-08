@@ -15,7 +15,7 @@ const FeatureSupportChecker = () => {
     }
 
     if (typeof SharedArrayBuffer === 'undefined') {
-      unsupported.push('SharedArrayBuffer is not supported')
+      unsupported.push('SharedArrayBuffer is not supported.')
     }
 
     setUnsupportedFeatures(unsupported)
