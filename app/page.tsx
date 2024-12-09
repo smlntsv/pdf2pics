@@ -9,9 +9,6 @@ import { Toolbar } from '@/components/toolbar'
 import { usePdfStore } from '@/stores/usePdfStore'
 import { ConversionSettings } from '@/components/conversion_settings'
 import { PDFWorkerPool } from '@/lib/pdf_worker_pool'
-import { Logo } from '@/components/logo'
-import { Footer } from '@/components/footer'
-import { ThemeSwitch } from '@/components/ui/theme_switch'
 import { FeatureSupportChecker } from '@/components/feature_support_checker'
 
 export default function Home() {
@@ -76,43 +73,32 @@ export default function Home() {
   )
 
   return (
-    <>
-      <ThemeSwitch className={'absolute right-4 top-4'} />
+    <main>
+      <section>
+        <DropZone
+          onFileSelected={onFileSelected}
+          className={'mt-4'}
+          isLoading={isDocumentLoading}
+        />
+      </section>
 
-      <header className={'mt-auto'}>
-        <Logo className={'mx-auto'} />
-      </header>
+      <FeatureSupportChecker />
 
-      <main>
-        <section>
-          <DropZone
-            onFileSelected={onFileSelected}
-            className={'mt-4'}
-            isLoading={isDocumentLoading}
-          />
-        </section>
-
-        <FeatureSupportChecker />
-
-        <section>
-          {pageCount > 0 ? (
-            <>
-              <ConversionSettings />
-              <PagesSelector className={'mt-6'} />
-              <Toolbar />
-            </>
-          ) : (
-            <p className={'mt-4 text-gray-600 dark:text-gray-300 text-center'}>
-              Easily convert PDF files to <strong>high-quality images</strong> with PDF to Pics.
-              This secure <strong>PWA</strong> works <strong>offline</strong>, ensuring fast,
-              private, and reliable conversions—all directly in your browser without uploading files
-              to a server.
-            </p>
-          )}
-        </section>
-      </main>
-
-      <Footer />
-    </>
+      <section>
+        {pageCount > 0 ? (
+          <>
+            <ConversionSettings />
+            <PagesSelector className={'mt-6'} />
+            <Toolbar />
+          </>
+        ) : (
+          <p className={'mt-4 text-gray-600 dark:text-gray-300 text-center'}>
+            Easily convert PDF files to <strong>high-quality images</strong> with PDF to Pics. This
+            secure <strong>PWA</strong> works <strong>offline</strong>, ensuring fast, private, and
+            reliable conversions—all directly in your browser without uploading files to a server.
+          </p>
+        )}
+      </section>
+    </main>
   )
 }
