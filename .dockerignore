@@ -1,0 +1,17 @@
+# Docker-related
+Dockerfile
+.dockerignore
+
+# Next.js specific
+.next
+certificates
+
+# IDEA
+.idea
+
+node_modules
+.git
+README.md
+.env.*
+.vscode
+.DS_Store

@@ -1,6 +1,5 @@
-import type { NextConfig } from 'next'
-
-const nextConfig: NextConfig = {
+/** @type {import("next").NextConfig} */
+const nextConfig = {
   async headers() {
     return [
       {
@@ -12,6 +11,8 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // https://nextjs.org/docs/pages/api-reference/next-config-js/output#automatically-copying-traced-files
+  output: 'standalone',
 }
 
-export default nextConfig
+export default withSerwist(nextConfig)
