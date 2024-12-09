@@ -80,7 +80,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       longPressTimer.current = setTimeout(() => {
         onLongPress(page).catch(() => {})
         longPressTimer.current = null
-      }, 200)
+      }, 250)
     },
     [onLongPress]
   )
