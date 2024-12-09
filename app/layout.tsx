@@ -10,8 +10,12 @@ import { ThemeSwitch } from '@/components/ui/theme_switch'
 import { Logo } from '@/components/logo'
 
 const APP_NAME = 'PDF to Pics'
+
 export const metadata: Metadata = {
-  title: APP_NAME,
+  title: {
+    template: `%s - ${APP_NAME}`,
+    default: APP_NAME,
+  },
   description:
     'Easily convert PDF files to high-quality images with PDF to Pics. This secure PWA works offline, ensuring fast, private, and reliable conversions—all directly in your browser without uploading files to a server.',
   appleWebApp: {
