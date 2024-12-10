@@ -1,0 +1,51 @@
+diff --git a/node_modules/pdfjs-dist/build/pdf.mjs b/node_modules/pdfjs-dist/build/pdf.mjs
+index c9f1e70..6da2bd5 100644
+--- a/node_modules/pdfjs-dist/build/pdf.mjs
++++ b/node_modules/pdfjs-dist/build/pdf.mjs
+@@ -5055,9 +5055,7 @@ class PrintAnnotationStorage extends AnnotationStorage {
+       hash,
+       transfer
+     } = parent.serializable;
+-    const clone = structuredClone(map, transfer ? {
+-      transfer
+-    } : null);
++    const clone = structuredClone(map);
+     this.#serializable = {
+       map: clone,
+       hash,
+@@ -12037,11 +12035,30 @@ class LoopbackPort {
+   #listeners = new Map();
+   #deferred = Promise.resolve();
+   postMessage(obj, transfer) {
+-    const event = {
+-      data: structuredClone(obj, transfer ? {
+-        transfer
+-      } : null)
+-    };
++    let event;
++    if (
++      obj['action'] === 'configure' ||
++      obj['action'] === 'GetDocRequest' ||
++      obj['action'] === 'DataLoaded' ||
++      obj['action'] === 'GetDoc' ||
++      obj['action'] === 'Ready' ||
++      obj['action'] === 'GetPage' ||
++      obj['action'] === 'GetOptionalContentConfig' ||
++      obj['action'] === 'GetOperatorList' ||
++      obj['action'] === 'obj' ||
++      obj['action'] === 'StartRenderPage' ||
++      obj['action'] === 'commonobj' ||
++      obj['action'] === 'FontFallback'
++    ) {
++      event = {
++        data: obj
++      };
++    } else {
++      event = {
++        data: structuredClone(obj)
++      };
++    }
++
+     this.#deferred.then(() => {
+       for (const [listener] of this.#listeners) {
+         listener.call(this, event);

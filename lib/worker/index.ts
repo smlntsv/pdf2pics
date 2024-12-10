@@ -1,27 +1,28 @@
 import type { PDFTaskDataWithId, PDFWorkerResponseDataWithId } from '@/lib/pdf_worker_pool'
 import { PDFWorkerRenderer } from '@/lib/worker/pdf_worker_renderer'
 
-const workerSelf = self as DedicatedWorkerGlobalScope
+declare const self: DedicatedWorkerGlobalScope
+
 const pdfWorkerRenderer = new PDFWorkerRenderer()
 
-workerSelf.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>) {
+self.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>) {
   switch (data.type) {
     case 'loadDocument': {
       try {
         await pdfWorkerRenderer.loadDocument(data.documentBuffer)
 
-        workerSelf.postMessage({
+        self.postMessage({
           id: data.id,
           type: 'documentLoaded',
           pageCount: pdfWorkerRenderer.pageCount,
-          workerName: workerSelf.name,
+          workerName: self.name,
         } as PDFWorkerResponseDataWithId)
       } catch (e) {
-        workerSelf.postMessage({
+        self.postMessage({
           id: data.id,
           type: 'error',
           errorMessage: (e as Error).message,
-          workerName: workerSelf.name,
+          workerName: self.name,
         } as PDFWorkerResponseDataWithId)
       }
       break
@@ -34,7 +35,7 @@ workerSelf.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>
           data.format,
           data.quality
         )
-        workerSelf.postMessage(
+        self.postMessage(
           {
             id: data.id,
             type: 'pageRendered',
@@ -44,16 +45,16 @@ workerSelf.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>
             height,
             format: data.format,
             quality: data.quality,
-            workerName: workerSelf.name,
+            workerName: self.name,
           } as PDFWorkerResponseDataWithId,
           [arrayBuffer] // transfer
         )
       } catch (e) {
-        workerSelf.postMessage({
+        self.postMessage({
           id: data.id,
           type: 'error',
           errorMessage: (e as Error).message,
-          workerName: workerSelf.name,
+          workerName: self.name,
         } as PDFWorkerResponseDataWithId)
       }
       break
@@ -61,30 +62,30 @@ workerSelf.onmessage = async function ({ data }: MessageEvent<PDFTaskDataWithId>
     case 'getPageSize': {
       try {
         const { width, height } = await pdfWorkerRenderer.getPageSize(data.pageNumber, data.scale)
-        workerSelf.postMessage({
+        self.postMessage({
           id: data.id,
           type: 'pageSizeRetrieved',
           pageNumber: data.pageNumber,
           width,
           height,
-          workerName: workerSelf.name,
+          workerName: self.name,
         } as PDFWorkerResponseDataWithId)
       } catch (e) {
-        workerSelf.postMessage({
+        self.postMessage({
           id: data.id,
           type: 'error',
           errorMessage: (e as Error).message,
-          workerName: workerSelf.name,
+          workerName: self.name,
         } as PDFWorkerResponseDataWithId)
       }
       break
     }
     default: {
-      workerSelf.postMessage({
+      self.postMessage({
         id: -1,
         type: 'error',
         errorMessage: 'Unknown task type.',
-        workerName: workerSelf.name,
+        workerName: self.name,
       } as PDFWorkerResponseDataWithId)
     }
   }

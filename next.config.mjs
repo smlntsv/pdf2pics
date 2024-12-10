@@ -1,3 +1,16 @@
+import withSerwistInit from '@serwist/next'
+
+const revision = crypto.randomUUID()
+
+const withSerwist = withSerwistInit({
+  cacheOnNavigation: true,
+  swSrc: 'lib/service_worker/index.ts',
+  swDest: 'public/sw.js',
+  additionalPrecacheEntries: [{ url: '/~offline', revision }],
+  // Prevent selected document reset on reconnect
+  reloadOnOnline: false,
+})
+
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   async headers() {
