@@ -9,6 +9,7 @@ import { Footer } from '@/components/footer'
 import { ThemeSwitch } from '@/components/ui/theme_switch'
 import { Logo } from '@/components/logo'
 import { startupImage } from '@/lib/apple_splash_screens'
+import Script from 'next/script'
 
 const APP_NAME = 'PDF to Pics'
 
@@ -38,6 +39,8 @@ export const metadata: Metadata = {
     // Required for splashscreen to work
     'apple-mobile-web-app-capable': 'yes',
   },
+  // public/js/update_manifest.js controls android=true query param
+  manifest: 'manifest.webmanifest',
 }
 
 export default function RootLayout({
@@ -54,6 +57,7 @@ export default function RootLayout({
           'bg-gradient-to-bl  dark:from-slate-900 dark:to-slate-600'
         )}
       >
+        <Script src={'js/update_manifest.js'} strategy={'beforeInteractive'} />
         <ThemeProvider
           attribute={'class'}
           defaultTheme={'system'}

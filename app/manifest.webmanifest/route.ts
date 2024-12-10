@@ -1,23 +1,29 @@
-import type { MetadataRoute } from 'next'
+import { type NextRequest } from 'next/server'
 
-export default function manifest(): MetadataRoute.Manifest {
-  return {
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const isAndroid = searchParams.has('android') && searchParams.get('android') === 'true'
+  const iconSrcSuffix = isAndroid ? 'android-' : ''
+
+  // if query params contains Android, then we use square icons
+  return Response.json({
+    id: 'pdf2pics',
     name: 'PDF to Pics',
     orientation: 'any',
-    short_name: 'PDF2PICS',
+    short_name: 'PDF to Pics',
     description: 'Convert PDFs to Pictures effortlessly',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
-    theme_color: '#000000',
+    theme_color: '#ffffff',
     icons: [
       {
-        src: 'img/icons/icon-192x192.png',
+        src: `img/icons/icon-${iconSrcSuffix}192x192.png`,
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: 'img/icons/icon-512x512.png',
+        src: `img/assets/icon-${iconSrcSuffix}512x512.png`,
         sizes: '512x512',
         type: 'image/png',
       },
@@ -38,5 +44,5 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '720x1280',
       },
     ],
-  }
+  })
 }
