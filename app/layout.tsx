@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme_provider'
 import { Footer } from '@/components/footer'
 import { ThemeSwitch } from '@/components/ui/theme_switch'
 import { Logo } from '@/components/logo'
+import { startupImage } from '@/lib/apple_splash_screens'
 
 const APP_NAME = 'PDF to Pics'
 
@@ -18,10 +19,24 @@ export const metadata: Metadata = {
   },
   description:
     'Easily convert PDF files to high-quality images with PDF to Pics. This secure PWA works offline, ensuring fast, private, and reliable conversions—all directly in your browser without uploading files to a server.',
+  icons: {
+    apple: [
+      {
+        url: 'img/icons/apple-touch-icon-180.png',
+        type: 'image/png',
+        sizes: '180x180',
+      },
+    ],
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
     title: APP_NAME,
+    startupImage,
+    statusBarStyle: 'black-translucent',
+  },
+  other: {
+    // Required for splashscreen to work
+    'apple-mobile-web-app-capable': 'yes',
   },
 }
 
