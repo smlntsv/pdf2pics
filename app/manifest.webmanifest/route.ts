@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
     display: 'standalone',
     background_color: '#ffffff',
     theme_color: '#ffffff',
+    // TODO: implement
+    // share_target: {},
     icons: [
       {
         src: `img/icons/icon-${iconSrcSuffix}192x192.png`,
@@ -30,18 +32,22 @@ export async function GET(request: NextRequest) {
     ],
     screenshots: [
       {
-        form_factor: 'wide',
-        label: 'Home screen showcasing the main interface for converting PDFs to images',
-        src: 'img/screenshots/home-1280x720.png',
+        form_factor: 'narrow',
+        src: 'https://pdf2.pics/img/screenshots/conversion-dark.png',
+        sizes: '599x1119',
         type: 'image/png',
-        sizes: '1280x720',
       },
       {
         form_factor: 'narrow',
-        label: 'Home screen showcasing the main interface for converting PDFs to images',
-        src: 'img/screenshots/home-720x1280.png',
+        src: 'https://pdf2.pics/img/screenshots/conversion-light.png',
+        sizes: '599x1119',
         type: 'image/png',
-        sizes: '720x1280',
+      },
+      {
+        form_factor: 'wide',
+        src: 'img/screenshots/home-1280x720.png',
+        type: 'image/png',
+        sizes: '1280x720',
       },
     ],
   })
