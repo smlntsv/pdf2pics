@@ -1,8 +1,7 @@
 import { type NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const isAndroid = searchParams.has('android') && searchParams.get('android') === 'true'
+  const isAndroid = request.headers.get('user-agent')?.indexOf('Android') !== -1
   const iconSrcSuffix = isAndroid ? 'android-' : ''
 
   // if query params contains Android, then we use square icons

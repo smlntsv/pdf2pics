@@ -9,7 +9,6 @@ import { Footer } from '@/components/footer'
 import { ThemeSwitch } from '@/components/ui/theme_switch'
 import { Logo } from '@/components/logo'
 import { startupImage } from '@/lib/apple_splash_screens'
-import Script from 'next/script'
 
 const APP_NAME = 'PDF to Pics'
 
@@ -57,7 +56,6 @@ export default function RootLayout({
           'bg-gradient-to-bl  dark:from-slate-900 dark:to-slate-600'
         )}
       >
-        <Script src={'js/update_manifest.js'} strategy={'beforeInteractive'} />
         <ThemeProvider
           attribute={'class'}
           defaultTheme={'system'}
