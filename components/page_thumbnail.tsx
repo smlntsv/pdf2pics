@@ -5,7 +5,6 @@ import { motion } from 'motion/react'
 import { PDFImageData, usePdfStore } from '@/stores/usePdfStore'
 import { LoaderCircle } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
-import { PAGE_THUMBNAIL_SCALE } from '@/lib/constants'
 
 interface Props {
   pageNumber: number
@@ -18,6 +17,8 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   const pdfWorkerPool = usePdfStore((state) => state.pdfWorkerPool)
   const setPreviewPageNumber = usePdfStore((state) => state.setPreviewPageNumber)
   const setPreviewImageData = usePdfStore((state) => state.setPreviewImageData)
+  const lowResScale = usePdfStore((state) => state.lowResScale)
+  const highResScale = usePdfStore((state) => state.highResScale)
 
   const isSelected = selectedPages.has(pageNumber)
   const inPreview = pageNumber === previewPageNumber
@@ -25,33 +26,34 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [alreadyInLine, setAlreadyInLine] = useState<boolean>(false)
   const [imageData, setImageData] = useState<PDFImageData | null>(null)
-  const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false)
-  const isLoading = !imageData || isPreviewLoading
+  const isLoading = !imageData
 
   // Load image for preview
   const onLongPress = useCallback(
-    async (pageNumber: number) => {
-      if (!pdfWorkerPool) {
+    (pageNumber: number) => {
+      if (!imageData) {
         toast({
-          title: 'Error',
-          description: 'The renderer is not ready yet.',
+          title: 'Warning',
+          description: `Thumbnail isn't rendered yet.`,
         })
-        return
+      } else {
+        const width = (imageData.width / lowResScale) * highResScale
+        const height = (imageData.height / lowResScale) * highResScale
+        setPreviewImageData({
+          width,
+          height,
+          objectURL: imageData.objectURL,
+        })
+        setPreviewPageNumber(pageNumber)
       }
-      setIsPreviewLoading(true)
-      const scale = window.devicePixelRatio || 1
-      const previewImageData = await renderPage(pageNumber, scale)
-      setPreviewImageData(previewImageData)
-      setPreviewPageNumber(pageNumber)
-      setIsPreviewLoading(false)
     },
-    [pdfWorkerPool, setPreviewImageData, setPreviewPageNumber]
+    [highResScale, imageData, lowResScale, setPreviewImageData, setPreviewPageNumber]
   )
 
   const onLongPressStart = useCallback(
     (page: number) => {
       longPressTimer.current = setTimeout(() => {
-        onLongPress(page).catch(() => {})
+        onLongPress(page)
         longPressTimer.current = null
       }, 250)
     },
@@ -65,12 +67,12 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
     }
   }, [])
 
-  // Render preview when it becomes visible
+  // Render thumbnail when it becomes visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!alreadyInLine && entry.isIntersecting) {
-          renderPage(pageNumber, PAGE_THUMBNAIL_SCALE)
+          renderPage(pageNumber, lowResScale)
             .then((imageData) => setImageData(imageData))
             .catch((error) => {
               toast({
@@ -91,7 +93,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
     }
 
     return () => observer.disconnect()
-  }, [pageNumber, alreadyInLine, pdfWorkerPool])
+  }, [pageNumber, alreadyInLine, pdfWorkerPool, lowResScale])
 
   return (
     <motion.div
@@ -117,7 +119,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       onTouchMove={onLongPressEnd}
     >
       {/* Checkbox */}
-      <div className={cn('absolute top-2 right-2', inPreview || (isLoading && 'hidden'))}>
+      <div className={cn('absolute top-2 right-2', (inPreview || isLoading) && 'hidden')}>
         <CheckboxIcon isSelected={isSelected} />
       </div>
 
@@ -125,7 +127,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       {isLoading && (
         <div
           className={
-            'absolute backdrop-blur-sm rounded-md  flex w-full h-full items-center justify-center'
+            'absolute backdrop-blur-sm rounded-lg  flex w-full h-full items-center justify-center'
           }
         >
           <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
@@ -133,10 +135,10 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       )}
 
       {/* Page image */}
-      {imageData && (
+      {!isLoading && (
         <motion.img
-          className={'rounded-lg pointer-events-none'}
-          layoutId={`img-${pageNumber.toString()}`}
+          layoutId={`preview-image-${pageNumber}`}
+          className={'rounded-lg pointer-events-none will-change-auto'}
           alt={`Page ${pageNumber}`}
           width={imageData.width}
           height={imageData.height}
@@ -149,7 +151,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
         className={cn(
           'absolute left-2 bottom-2 px-3 py-1 bg-white text-gray-500 rounded-full border',
           'text-sm',
-          isLoading && 'hidden'
+          (isLoading || inPreview) && 'hidden'
         )}
       >
         Page {pageNumber}

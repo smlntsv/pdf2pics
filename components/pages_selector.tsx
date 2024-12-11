@@ -78,7 +78,9 @@ const PagesSelector: FC<PagesSelectorProps> = ({ className }) => {
 
       {/* High-Res Preview */}
       <AnimatePresence>
-        {previewPageNumber > 0 && <PageHighResPreview onClose={onHighResPreviewClose} />}
+        {previewPageNumber > 0 && (
+          <PageHighResPreview pageNumber={previewPageNumber} onClose={onHighResPreviewClose} />
+        )}
       </AnimatePresence>
     </div>
   )

@@ -2,7 +2,6 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { PDFImageData, usePdfStore } from '@/stores/usePdfStore'
 import { PDFWorkerPool, PDFWorkerResponseData } from '@/lib/pdf_worker_pool'
-import { EXPORT_QUALITY } from '@/lib/constants'
 import JSZip from 'jszip'
 
 export function cn(...inputs: ClassValue[]) {
@@ -112,6 +111,7 @@ export async function exportSelectedPages(): Promise<void> {
   // Generate final scales and render pages
   const pagesRenderingPromises: Promise<PDFWorkerResponseData>[] = []
   const [exportWidth, exportHeight] = exportResolution.split('x').map((size) => parseInt(size, 10))
+  const EXPORT_QUALITY = 1
 
   for (const { width, height, pageNumber } of pageSizes) {
     const targetScale = calculateScaleFromMaxResolution(width, height, exportWidth, exportHeight)

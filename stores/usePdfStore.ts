@@ -25,6 +25,8 @@ type PdfStoreState = {
   // Rendering
   previewPageNumber: number
   previewImageData: PDFImageData | null
+  highResScale: number
+  lowResScale: number
 }
 
 type PdfStoreActions = {
@@ -53,6 +55,14 @@ const usePdfStore = create<PdfStore>()(
     },
     pdfWorkerPool: null,
     initializePdfWorkerPool: async (file: FileWithPath) => {
+      // Reset
+      set((state) => {
+        state.pageCount = 0
+        state.selectedPages = new Set<number>()
+        state.previewPageNumber = 0
+        state.selectedFileName = null
+      })
+
       // Convert to SharedArrayBuffer
       const arrayBuffer = await file.arrayBuffer()
       const sharedArrayBuffer = new SharedArrayBuffer(arrayBuffer.byteLength)
@@ -118,6 +128,8 @@ const usePdfStore = create<PdfStore>()(
         state.previewImageData = imageData
       })
     },
+    highResScale: typeof window !== 'undefined' ? window.devicePixelRatio : 2,
+    lowResScale: 0.6,
   }))
 )
 
