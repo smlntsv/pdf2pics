@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import '@/lib/polyfills'
@@ -9,6 +9,13 @@ import { Footer } from '@/components/footer'
 import { ThemeSwitch } from '@/components/ui/theme_switch'
 import { Logo } from '@/components/logo'
 import { startupImage } from '@/lib/apple_splash_screens'
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+  ],
+}
 
 const APP_NAME = 'PDF to Pics'
 
@@ -53,7 +60,7 @@ export default function RootLayout({
         className={cn(
           'flex flex-col mx-auto',
           'min-h-dvh w-full max-w-6xl p-4',
-          'bg-gradient-to-bl  dark:from-slate-900 dark:to-slate-600'
+          'bg-gradient-to-b  dark:from-slate-900 dark:to-slate-600'
         )}
       >
         <ThemeProvider
