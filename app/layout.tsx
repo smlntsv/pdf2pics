@@ -45,7 +45,6 @@ export const metadata: Metadata = {
     // Required for splashscreen to work
     'apple-mobile-web-app-capable': 'yes',
   },
-  // public/js/update_manifest.js controls android=true query param
   manifest: 'manifest.webmanifest',
 }
 

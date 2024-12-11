@@ -1,19 +1,34 @@
 'use client'
 
-import { FC, useCallback } from 'react'
+import { FC, useCallback, useState } from 'react'
 import { useDropzone, FileRejection, FileWithPath } from 'react-dropzone'
 import { cn } from '@/lib/utils'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from '@/hooks/use-toast'
 import { FileInput, LoaderCircle } from 'lucide-react'
+import { usePdfStore } from '@/stores/usePdfStore'
 
 interface Props {
-  onFileSelected: (file: File) => void
-  isLoading: boolean
   className?: string
 }
 
-const DropZone: FC<Props> = ({ onFileSelected, isLoading, className }) => {
-  const { toast } = useToast()
+const DropZone: FC<Props> = ({ className }) => {
+  const [isLoading, setIsLoading] = useState<boolean>()
+  const initializePdfWorkerPool = usePdfStore((state) => state.initializePdfWorkerPool)
+
+  const onFileSelected = useCallback(
+    async (file: FileWithPath) => {
+      try {
+        await initializePdfWorkerPool(file)
+      } catch (err) {
+        toast({
+          title: 'Error',
+          description: `Failed to load document: ${(err as Error).message}`,
+          variant: 'destructive',
+        })
+      }
+    },
+    [initializePdfWorkerPool]
+  )
 
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[], fileRejections: FileRejection[]) => {
@@ -25,9 +40,12 @@ const DropZone: FC<Props> = ({ onFileSelected, isLoading, className }) => {
         })
       })
 
-      if (acceptedFiles.length) onFileSelected(acceptedFiles[0])
+      if (acceptedFiles.length) {
+        setIsLoading(true)
+        onFileSelected(acceptedFiles[0]).finally(() => setIsLoading(false))
+      }
     },
-    [onFileSelected, toast]
+    [onFileSelected]
   )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

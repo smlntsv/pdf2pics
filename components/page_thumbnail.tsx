@@ -1,10 +1,9 @@
 import { FC, MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
-import { cn } from '@/lib/utils'
+import { cn, renderPage } from '@/lib/utils'
 import { CheckboxIcon } from '@/components/ui/checkbox_icon'
 import { motion } from 'motion/react'
 import { PDFImageData, usePdfStore } from '@/stores/usePdfStore'
 import { LoaderCircle } from 'lucide-react'
-import { PDFWorkerPool } from '@/lib/pdf_worker_pool'
 import { toast } from '@/hooks/use-toast'
 import { PAGE_THUMBNAIL_SCALE } from '@/lib/constants'
 
@@ -14,13 +13,11 @@ interface Props {
 }
 
 const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
-  const {
-    selectedPages,
-    previewPageNumber,
-    pdfWorkerPool,
-    setPreviewPageNumber,
-    setPreviewImageData,
-  } = usePdfStore()
+  const selectedPages = usePdfStore((state) => state.selectedPages)
+  const previewPageNumber = usePdfStore((state) => state.previewPageNumber)
+  const pdfWorkerPool = usePdfStore((state) => state.pdfWorkerPool)
+  const setPreviewPageNumber = usePdfStore((state) => state.setPreviewPageNumber)
+  const setPreviewImageData = usePdfStore((state) => state.setPreviewImageData)
 
   const isSelected = selectedPages.has(pageNumber)
   const inPreview = pageNumber === previewPageNumber
@@ -30,30 +27,6 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   const [imageData, setImageData] = useState<PDFImageData | null>(null)
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false)
   const isLoading = !imageData || isPreviewLoading
-
-  const renderPage = useCallback(
-    (
-      pdfWorkerPool: PDFWorkerPool,
-      pageNumber: number,
-      scale: number = 0.8
-    ): Promise<PDFImageData> =>
-      new Promise(async (resolve, reject) => {
-        const responseData = await pdfWorkerPool?.renderPage(pageNumber, scale)
-        if (responseData.type === 'pageRendered') {
-          const blob = new Blob([responseData.pageImageArrayBuffer])
-          const objectURL = URL.createObjectURL(blob)
-
-          resolve({
-            objectURL,
-            width: responseData.width,
-            height: responseData.height,
-          })
-        } else {
-          reject('Unexpected response type.')
-        }
-      }),
-    []
-  )
 
   // Load image for preview
   const onLongPress = useCallback(
@@ -67,12 +40,12 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       }
       setIsPreviewLoading(true)
       const scale = window.devicePixelRatio || 1
-      const previewImageData = await renderPage(pdfWorkerPool, pageNumber, scale)
+      const previewImageData = await renderPage(pageNumber, scale)
       setPreviewImageData(previewImageData)
       setPreviewPageNumber(pageNumber)
       setIsPreviewLoading(false)
     },
-    [pdfWorkerPool, renderPage, setPreviewImageData, setPreviewPageNumber]
+    [pdfWorkerPool, setPreviewImageData, setPreviewPageNumber]
   )
 
   const onLongPressStart = useCallback(
@@ -96,8 +69,8 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!alreadyInLine && entry.isIntersecting && pdfWorkerPool) {
-          renderPage(pdfWorkerPool, pageNumber, PAGE_THUMBNAIL_SCALE)
+        if (!alreadyInLine && entry.isIntersecting) {
+          renderPage(pageNumber, PAGE_THUMBNAIL_SCALE)
             .then((imageData) => setImageData(imageData))
             .catch((error) => {
               toast({
@@ -118,7 +91,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
     }
 
     return () => observer.disconnect()
-  }, [pageNumber, alreadyInLine, pdfWorkerPool, renderPage])
+  }, [pageNumber, alreadyInLine, pdfWorkerPool])
 
   return (
     <motion.div

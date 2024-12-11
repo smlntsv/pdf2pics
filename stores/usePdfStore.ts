@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { PDFWorkerPool } from '@/lib/pdf_worker_pool'
 import { ExportFormat, ExportResolution } from '@/components/conversion_settings'
+import { FileWithPath } from 'react-dropzone'
 
 // TODO: refactor?
 export type PDFImageData = {
@@ -28,7 +29,8 @@ type PdfStoreState = {
 
 type PdfStoreActions = {
   setSelectedFileName: (selectedFileName: string | null) => void
-  setPdfWorkerPool: (pdfWorkerPool: PDFWorkerPool) => void
+  initializePdfWorkerPool: (file: FileWithPath) => Promise<void>
+  terminatePdfWorkerPool: () => void
   setPageCount: (newCount: number) => void
   setSelectedPages(newSelectedPages: Set<number>): void
   setLastSelectedPages: (newLastSelectedPages: number[]) => void
@@ -42,7 +44,7 @@ type PdfStoreActions = {
 type PdfStore = PdfStoreState & PdfStoreActions
 
 const usePdfStore = create<PdfStore>()(
-  immer((set) => ({
+  immer((set, get) => ({
     selectedFileName: null,
     setSelectedFileName: (selectedFileName: string | null) => {
       set((state) => {
@@ -50,10 +52,28 @@ const usePdfStore = create<PdfStore>()(
       })
     },
     pdfWorkerPool: null,
-    setPdfWorkerPool: (newPdfWorkerPool: PDFWorkerPool): void => {
+    initializePdfWorkerPool: async (file: FileWithPath) => {
+      // Convert to SharedArrayBuffer
+      const arrayBuffer = await file.arrayBuffer()
+      const sharedArrayBuffer = new SharedArrayBuffer(arrayBuffer.byteLength)
+      const sharedView = new Uint8Array(sharedArrayBuffer)
+      sharedView.set(new Uint8Array(arrayBuffer))
+
+      let pool = get().pdfWorkerPool
+      if (!pool) pool = new PDFWorkerPool()
+      const pageCounts = await pool.initializeDocument(sharedArrayBuffer)
+
       set((state) => {
-        state.pdfWorkerPool = newPdfWorkerPool
+        state.pageCount = pageCounts[0]
+        state.selectedPages = new Set<number>()
+        state.pdfWorkerPool = pool
+        state.previewPageNumber = 0
+        state.selectedFileName = file.name
       })
+    },
+    terminatePdfWorkerPool: () => {
+      const pool = get().pdfWorkerPool
+      if (pool) pool.terminate()
     },
     pageCount: 0,
     setPageCount: (newPageCount: number): void => {

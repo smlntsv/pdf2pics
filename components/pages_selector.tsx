@@ -12,15 +12,13 @@ interface PagesSelectorProps {
 }
 
 const PagesSelector: FC<PagesSelectorProps> = ({ className }) => {
-  const {
-    pageCount,
-    selectedPages,
-    setSelectedPages,
-    lastSelectedPages,
-    setLastSelectedPages,
-    previewPageNumber,
-    setPreviewPageNumber,
-  } = usePdfStore()
+  const pageCount = usePdfStore((state) => state.pageCount)
+  const selectedPages = usePdfStore((state) => state.selectedPages)
+  const setSelectedPages = usePdfStore((state) => state.setSelectedPages)
+  const lastSelectedPages = usePdfStore((state) => state.lastSelectedPages)
+  const setLastSelectedPages = usePdfStore((state) => state.setLastSelectedPages)
+  const previewPageNumber = usePdfStore((state) => state.previewPageNumber)
+  const setPreviewPageNumber = usePdfStore((state) => state.setPreviewPageNumber)
 
   const onPageClick = useCallback(
     (clickedPage: number, isShiftKeyPressed: boolean) => {

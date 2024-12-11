@@ -11,7 +11,8 @@ interface Props {
 }
 
 const PageHighResPreview: FC<Props> = ({ onClose }) => {
-  const { previewPageNumber, previewImageData } = usePdfStore()
+  const previewPageNumber = usePdfStore((state) => state.previewPageNumber)
+  const previewImageData = usePdfStore((state) => state.previewImageData)
 
   return (
     <div className={'fixed inset-0 z-10 flex items-center justify-center p-4'} onClick={onClose}>

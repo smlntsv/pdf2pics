@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { usePdfStore } from '@/stores/usePdfStore'
-import { PDFWorkerResponseData } from '@/lib/pdf_worker_pool'
+import { PDFImageData, usePdfStore } from '@/stores/usePdfStore'
+import { PDFWorkerPool, PDFWorkerResponseData } from '@/lib/pdf_worker_pool'
 import { EXPORT_QUALITY } from '@/lib/constants'
 import JSZip from 'jszip'
 
@@ -42,6 +42,30 @@ export function downloadBlob(blob: Blob, fileName: string): void {
   link.download = fileName
   link.click()
   URL.revokeObjectURL(url) // Clean up the object URL
+}
+
+export function renderPage(pageNumber: number, scale: number): Promise<PDFImageData> {
+  return new Promise(async (resolve, reject) => {
+    const pdfWorkerPool: PDFWorkerPool | null = usePdfStore.getState().pdfWorkerPool
+    if (!pdfWorkerPool) {
+      reject('PDFWorkerPool not ready')
+      return
+    }
+
+    const responseData = await pdfWorkerPool.renderPage(pageNumber, scale)
+    if (responseData.type === 'pageRendered') {
+      const blob = new Blob([responseData.pageImageArrayBuffer])
+      const objectURL = URL.createObjectURL(blob)
+
+      resolve({
+        objectURL,
+        width: responseData.width,
+        height: responseData.height,
+      })
+    } else {
+      reject('Unexpected response type.')
+    }
+  })
 }
 
 export async function exportSelectedPages(): Promise<void> {

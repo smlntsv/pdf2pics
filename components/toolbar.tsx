@@ -1,18 +1,20 @@
 import { cn, exportSelectedPages } from '@/lib/utils'
 import { Download, LoaderCircle, X } from 'lucide-react'
 import { ToolbarButton } from '@/components/ui/toolbar_button'
-import { FC, useState } from 'react'
+import { FC, useCallback, useState } from 'react'
 import { usePdfStore } from '@/stores/usePdfStore'
 
 const Toolbar: FC = () => {
   const [isExportInProgress, setIsExportInProgress] = useState<boolean>(false)
-  const { selectedPages, setSelectedPages } = usePdfStore()
 
-  const onExportSelectedClicked = async () => {
+  const selectedPages = usePdfStore((state) => state.selectedPages)
+  const setSelectedPages = usePdfStore((state) => state.setSelectedPages)
+
+  const onExportSelectedClicked = useCallback(async () => {
     setIsExportInProgress(true)
     await exportSelectedPages()
     setIsExportInProgress(false)
-  }
+  }, [])
 
   return (
     <div className={cn('sticky mt-6 w-full max-w-6xl bottom-4 right-0 left-0 mx-auto')}>

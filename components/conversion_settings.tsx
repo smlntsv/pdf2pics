@@ -71,7 +71,10 @@ const EXPORT_RESOLUTION_OPTIONS: Option<ExportResolution>[] = [
 ]
 
 const ConversionSettings: FC = () => {
-  const { exportResolution, setExportResolution, exportFormat, setExportFormat } = usePdfStore()
+  const exportResolution = usePdfStore((state) => state.exportResolution)
+  const setExportResolution = usePdfStore((state) => state.setExportResolution)
+  const exportFormat = usePdfStore((state) => state.exportFormat)
+  const setExportFormat = usePdfStore((state) => state.setExportFormat)
 
   return (
     <fieldset

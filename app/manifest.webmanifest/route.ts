@@ -1,4 +1,5 @@
 import { type NextRequest } from 'next/server'
+import { type Manifest } from 'next/dist/lib/metadata/types/manifest-types'
 
 export async function GET(request: NextRequest) {
   const isAndroid = request.headers.get('user-agent')?.indexOf('Android') !== -1
@@ -49,5 +50,5 @@ export async function GET(request: NextRequest) {
         sizes: '1280x720',
       },
     ],
-  })
+  } as Manifest)
 }
