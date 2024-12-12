@@ -1,5 +1,5 @@
 diff --git a/node_modules/pdfjs-dist/build/pdf.mjs b/node_modules/pdfjs-dist/build/pdf.mjs
-index c9f1e70..6da2bd5 100644
+index c9f1e70..76f1348 100644
 --- a/node_modules/pdfjs-dist/build/pdf.mjs
 +++ b/node_modules/pdfjs-dist/build/pdf.mjs
 @@ -5055,9 +5055,7 @@ class PrintAnnotationStorage extends AnnotationStorage {
@@ -13,7 +13,57 @@ index c9f1e70..6da2bd5 100644
      this.#serializable = {
        map: clone,
        hash,
-@@ -12037,11 +12035,30 @@ class LoopbackPort {
+@@ -5082,11 +5080,17 @@ class PrintAnnotationStorage extends AnnotationStorage {
+ 
+ class FontLoader {
+   #systemFonts = new Set();
++  #fonts;
+   constructor({
+     ownerDocument = globalThis.document,
+     styleElement = null
+   }) {
+     this._document = ownerDocument;
++    if (this._document && this._document.fonts) {
++      this.#fonts = this._document.fonts;
++    } else if (globalThis.fonts) {
++      this.#fonts = globalThis.fonts;
++    }
+     this.nativeFontFaces = new Set();
+     this.styleElement = null;
+     this.loadingRequests = [];
+@@ -5094,11 +5098,11 @@ class FontLoader {
+   }
+   addNativeFontFace(nativeFontFace) {
+     this.nativeFontFaces.add(nativeFontFace);
+-    this._document.fonts.add(nativeFontFace);
++    this.#fonts.add(nativeFontFace);
+   }
+   removeNativeFontFace(nativeFontFace) {
+     this.nativeFontFaces.delete(nativeFontFace);
+-    this._document.fonts.delete(nativeFontFace);
++    this.#fonts.delete(nativeFontFace);
+   }
+   insertRule(rule) {
+     if (!this.styleElement) {
+@@ -5110,7 +5114,7 @@ class FontLoader {
+   }
+   clear() {
+     for (const nativeFontFace of this.nativeFontFaces) {
+-      this._document.fonts.delete(nativeFontFace);
++      this.#fonts.delete(nativeFontFace);
+     }
+     this.nativeFontFaces.clear();
+     this.#systemFonts.clear();
+@@ -5183,7 +5187,7 @@ class FontLoader {
+     }
+   }
+   get isFontLoadingAPISupported() {
+-    const hasFonts = !!this._document?.fonts;
++    const hasFonts = !!this._document?.fonts || !!globalThis.fonts;
+     return shadow(this, "isFontLoadingAPISupported", hasFonts);
+   }
+   get isSyncFontLoadingSupported() {
+@@ -12037,11 +12041,30 @@ class LoopbackPort {
    #listeners = new Map();
    #deferred = Promise.resolve();
    postMessage(obj, transfer) {

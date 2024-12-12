@@ -32,10 +32,9 @@ class PDFWorkerRenderer {
     const loadingTask = getDocument({
       data,
       CanvasFactory: OffscreenCanvasFactory,
-      // disableRange: true,
-      // disableStream: true,
-      // disableAutoFetch: true,
-      disableFontFace: true, // To render fonts
+      disableRange: true,
+      disableStream: true,
+      disableAutoFetch: true,
       verbosity: 0, // Hide unnecessary messages
     })
 
