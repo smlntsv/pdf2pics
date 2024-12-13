@@ -138,7 +138,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       {!isLoading && (
         <motion.img
           layoutId={`preview-image-${pageNumber}`}
-          className={'rounded-lg pointer-events-none will-change-auto'}
+          className={cn('rounded-lg pointer-events-none will-change-auto', inPreview && 'hidden')}
           alt={`Page ${pageNumber}`}
           width={imageData.width}
           height={imageData.height}
@@ -151,7 +151,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
         className={cn(
           'absolute left-2 bottom-2 px-3 py-1 bg-white text-gray-500 rounded-full border',
           'text-sm',
-          (isLoading || inPreview) && 'hidden'
+          isLoading && 'hidden'
         )}
       >
         Page {pageNumber}

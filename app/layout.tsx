@@ -1,9 +1,8 @@
+import '@/lib/polyfills'
+import './globals.css'
 import { ReactNode } from 'react'
 import type { Metadata, Viewport } from 'next'
-import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
-import '@/lib/polyfills'
-import { cn } from '@/lib/utils'
 import { ThemeProvider } from '@/components/theme_provider'
 import { Footer } from '@/components/footer'
 import { ThemeSwitch } from '@/components/ui/theme_switch'
@@ -69,29 +68,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          'flex flex-col mx-auto',
-          'min-h-dvh w-full max-w-6xl p-4',
-          'bg-gradient-to-b  dark:from-slate-900 dark:to-slate-600'
-        )}
-      >
+      <body className={'bg-gradient-to-b  dark:from-slate-900 dark:to-slate-600'}>
         <ThemeProvider
           attribute={'class'}
           defaultTheme={'system'}
           enableSystem
           disableTransitionOnChange
         >
-          <ThemeSwitch className={'absolute right-4 top-4'} />
+          <div className={'min-h-dvh flex flex-col  p-4'}>
+            <ThemeSwitch className={'absolute right-4 top-4'} />
 
-          <header className={'mt-auto'}>
-            <Logo className={'mx-auto'} />
-          </header>
+            {/* Header */}
+            <header className={'mt-auto'}>
+              <Logo className={'mx-auto'} />
+            </header>
 
-          {children}
+            {/* Content */}
+            <main className={'max-w-6xl w-full mx-auto'}>{children}</main>
 
-          <Footer />
-          <Toaster />
+            <Footer />
+            <Toaster />
+          </div>
         </ThemeProvider>
       </body>
     </html>

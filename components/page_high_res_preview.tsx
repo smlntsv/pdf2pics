@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import { usePdfStore } from '@/stores/usePdfStore'
 import { motion } from 'motion/react'
 import { renderPage } from '@/lib/utils'
@@ -17,6 +17,18 @@ const PageHighResPreview: FC<Props> = ({ onClose, pageNumber }) => {
   const setPreviewImageData = usePdfStore((state) => state.setPreviewImageData)
   const highResScale = usePdfStore((state) => state.highResScale)
 
+  useEffect(() => {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+
+    document.body.style.overflow = 'hidden'
+    document.body.style.paddingRight = scrollbarWidth + 'px'
+
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+    }
+  }, [])
+
   const renderHighResPreview = useCallback(async () => {
     setIsLoading(true)
     const previewImageData = await renderPage(pageNumber, highResScale)
@@ -25,28 +37,43 @@ const PageHighResPreview: FC<Props> = ({ onClose, pageNumber }) => {
   }, [highResScale, pageNumber, setPreviewImageData])
 
   return (
-    <div className={'z-20 fixed inset-0 overflow-auto backdrop-contrast-75'} onClick={onClose}>
+    <>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.4 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        style={{ willChange: 'opacity' }}
+        className="z-10 fixed inset-0 bg-black pointer-events-auto"
+        onClick={onClose}
+      />
+
+      {/* Preview image */}
       {previewImageData && (
-        <div className="relative w-fit mx-auto">
-          {/* Loading indicator positioned at the top right */}
-          {isLoading && (
-            <div className="z-30 absolute top-2 right-2">
-              <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
-            </div>
-          )}
-          <motion.img
-            layout={false}
-            layoutId={`preview-image-${pageNumber}`}
-            width={previewImageData.width}
-            height={previewImageData.height}
-            src={previewImageData.objectURL}
-            className={'mx-auto will-change-auto rounded-lg'}
-            alt={`Page ${pageNumber} preview`}
-            onLayoutAnimationComplete={renderHighResPreview}
-          />
+        <div className="fixed inset-0 overflow-auto z-20" onClick={onClose}>
+          <div className={'relative w-fit mx-auto'}>
+            {isLoading && (
+              <div className="z-50 absolute top-2 right-2">
+                <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
+              </div>
+            )}
+
+            <motion.img
+              layoutId={`preview-image-${pageNumber}`}
+              width={previewImageData.width}
+              height={previewImageData.height}
+              src={previewImageData.objectURL}
+              style={{
+                willChange: 'transform, opacity',
+              }}
+              alt={`Page ${pageNumber} preview`}
+              onLayoutAnimationComplete={renderHighResPreview}
+            />
+          </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 

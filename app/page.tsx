@@ -14,23 +14,21 @@ export default function Home() {
   return (
     <>
       <FeatureSupportChecker />
-      <main>
-        <section>
-          <DropZone className={'mt-4'} />
-        </section>
+      <section className={'w-full'}>
+        <DropZone className={'mt-4'} />
+      </section>
 
-        <section>
-          {pageCount > 0 && (
-            <>
-              <ConversionSettings />
-              <PagesSelector className={'mt-6'} />
-              <Toolbar />
-            </>
-          )}
+      <section>
+        {pageCount > 0 && (
+          <>
+            <ConversionSettings />
+            <PagesSelector className={'mt-6'} />
+            <Toolbar />
+          </>
+        )}
 
-          {pageCount === 0 && <PromoText />}
-        </section>
-      </main>
+        {pageCount === 0 && <PromoText />}
+      </section>
     </>
   )
 }
