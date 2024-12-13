@@ -34,6 +34,20 @@ export const metadata: Metadata = {
         sizes: '180x180',
       },
     ],
+    icon: [
+      {
+        url: 'img/icons/icon.svg',
+        type: 'image/svg+xml',
+        sizes: 'any',
+        rel: 'icon',
+      },
+      {
+        url: 'img/icons/icon-32.png',
+        type: 'image/png',
+        sizes: '32x32',
+        rel: 'icon',
+      },
+    ],
   },
   appleWebApp: {
     capable: true,
