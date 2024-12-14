@@ -5,7 +5,6 @@ export async function GET(request: NextRequest) {
   const isAndroid = request.headers.get('user-agent')?.indexOf('Android') !== -1
   const iconSrcSuffix = isAndroid ? 'android-' : ''
 
-  // if query params contains Android, then we use square icons
   return Response.json({
     id: 'pdf2pics',
     name: 'PDF to Pics',
@@ -25,7 +24,7 @@ export async function GET(request: NextRequest) {
         type: 'image/png',
       },
       {
-        src: `img/assets/icon-${iconSrcSuffix}512x512.png`,
+        src: `img/icons/icon-${iconSrcSuffix}512x512.png`,
         sizes: '512x512',
         type: 'image/png',
       },
