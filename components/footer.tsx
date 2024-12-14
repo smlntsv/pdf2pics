@@ -12,11 +12,15 @@ const Footer = () => {
   const iconsClasses = 'w-6 h-6 hover:text-gray-600 dark:hover:text-blue-400'
 
   return (
-    <footer className="mt-auto pt-10 text-muted-foreground">
-      <div className="container mx-auto text-center">
-        <p className="text-sm">
+    <footer className="mt-auto pt-10 text-gray-500 dark:text-gray-300">
+      <div className="container mx-auto text-center text-sm">
+        <p>
           This project is open-sourced and available on{' '}
-          <Link href={GITHUB_REPO_URL} target="_blank" className="text-blue-400 hover:underline">
+          <Link
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+          >
             GitHub
           </Link>
           .
@@ -47,11 +51,11 @@ const Footer = () => {
           </Link>
         </div>
 
-        <p className="mt-4 text-xs text-gray-400">
+        <p className="mt-4">
           Made with ❤️ by Dima using Next.js &copy; {new Date().getFullYear()}. All rights reserved.
         </p>
 
-        <p className="mt-2 text-sm text-blue-400">
+        <p className="mt-2 text-sm text-blue-600 dark:text-blue-400 font-medium">
           <Link href={`mailto:${EMAIL}`} className="hover:underline">
             Currently open to job opportunities! Let&#39;s connect.
           </Link>

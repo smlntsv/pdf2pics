@@ -82,7 +82,7 @@ const DropZone: FC<Props> = ({ className }) => {
         htmlFor="dropzone-file"
         className={cn(
           'flex flex-col items-center justify-center w-full h-40 border-2 border-blue-300 border-dashed rounded-lg cursor-pointer',
-          'dark:bg-slate-700 hover:bg-gray-100 dark:border-blue-400 dark:hover:border-blue-200 dark:hover:bg-slate-600',
+          'dark:bg-slate-700 hover:bg-gray-100 dark:border-blue-400 dark:hover:border-blue-200 dark:hover:bg-slate-800',
           isDragActive && 'bg-gray-100 dark:border-gray-500 dark:bg-gray-600'
         )}
       >
@@ -95,7 +95,7 @@ const DropZone: FC<Props> = ({ className }) => {
           ) : (
             <>
               <p className="mb-2 dark:text-gray-300">Drag and drop or click to choose PDF file</p>
-              <p className=" text-gray-500 dark:text-gray-400">
+              <p className=" text-gray-500 dark:text-gray-300 text-sm font-medium">
                 You can choose at most one PDF file
               </p>
             </>

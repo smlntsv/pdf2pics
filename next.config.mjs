@@ -46,9 +46,10 @@ const nextConfig = {
    * @returns {import('webpack').Configuration}
    */
   webpack: (config) => {
-    config.optimization.minimize = false
+    config.optimization.minimize = true
     return config
   },
+  productionBrowserSourceMaps: false,
 }
 
 export default withSerwist(nextConfig)

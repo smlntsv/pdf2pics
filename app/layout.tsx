@@ -59,6 +59,9 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-capable': 'yes',
   },
   manifest: 'manifest.webmanifest',
+  alternates: {
+    canonical: 'https://pdf2.pics',
+  },
 }
 
 export default function RootLayout({
