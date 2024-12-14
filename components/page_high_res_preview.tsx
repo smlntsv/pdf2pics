@@ -23,11 +23,18 @@ const PageHighResPreview: FC<Props> = ({ onClose, pageNumber }) => {
     document.body.style.overflow = 'hidden'
     document.body.style.paddingRight = scrollbarWidth + 'px'
 
+    const onKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKeyPress)
+
     return () => {
       document.body.style.overflow = ''
       document.body.style.paddingRight = ''
+
+      document.removeEventListener('keydown', onKeyPress)
     }
-  }, [])
+  }, [onClose])
 
   const renderHighResPreview = useCallback(async () => {
     setIsLoading(true)
@@ -35,6 +42,8 @@ const PageHighResPreview: FC<Props> = ({ onClose, pageNumber }) => {
     setPreviewImageData(previewImageData)
     setIsLoading(false)
   }, [highResScale, pageNumber, setPreviewImageData])
+
+  if (!previewImageData) return null
 
   return (
     <>
@@ -50,29 +59,27 @@ const PageHighResPreview: FC<Props> = ({ onClose, pageNumber }) => {
       />
 
       {/* Preview image */}
-      {previewImageData && (
-        <div className="fixed inset-0 overflow-auto z-20" onClick={onClose}>
-          <div className={'relative w-fit mx-auto'}>
-            {isLoading && (
-              <div className="z-50 absolute top-2 right-2">
-                <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
-              </div>
-            )}
+      <div className="fixed inset-0 overflow-auto z-20 p-8" onClick={onClose}>
+        <div className={'relative w-fit mx-auto'}>
+          {isLoading && (
+            <div className="z-50 absolute top-2 right-2">
+              <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
+            </div>
+          )}
 
-            <motion.img
-              layoutId={`preview-image-${pageNumber}`}
-              width={previewImageData.width}
-              height={previewImageData.height}
-              src={previewImageData.objectURL}
-              style={{
-                willChange: 'transform, opacity',
-              }}
-              alt={`Page ${pageNumber} preview`}
-              onLayoutAnimationComplete={renderHighResPreview}
-            />
-          </div>
+          <motion.img
+            layoutId={`preview-image-${pageNumber}`}
+            width={previewImageData.width}
+            height={previewImageData.height}
+            src={previewImageData.objectURL}
+            style={{
+              willChange: 'transform, opacity',
+            }}
+            alt={`Page ${pageNumber} preview`}
+            onLayoutAnimationComplete={renderHighResPreview}
+          />
         </div>
-      )}
+      </div>
     </>
   )
 }

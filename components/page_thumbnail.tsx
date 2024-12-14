@@ -1,10 +1,11 @@
-import { FC, MouseEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { FC, MouseEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { cn, renderPage } from '@/lib/utils'
 import { CheckboxIcon } from '@/components/ui/checkbox_icon'
 import { motion } from 'motion/react'
 import { PDFImageData, usePdfStore } from '@/stores/usePdfStore'
 import { LoaderCircle } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import { PageNumber } from '@/components/page_number'
 
 interface Props {
   pageNumber: number
@@ -95,6 +96,29 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
     return () => observer.disconnect()
   }, [pageNumber, alreadyInLine, pdfWorkerPool, lowResScale])
 
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (previewPageNumber > 0) {
+        if (e.code === 'Enter') {
+          setPreviewPageNumber(0)
+        }
+
+        return
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault()
+        onClick(pageNumber, e.shiftKey)
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        onLongPress(pageNumber)
+      }
+    },
+    [onClick, onLongPress, pageNumber, previewPageNumber, setPreviewPageNumber]
+  )
+
   return (
     <motion.div
       ref={containerRef}
@@ -105,6 +129,13 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
         isSelected ? 'border-blue-500' : 'border-gray-200 dark:border-gray-600',
         !imageData && 'aspect-[8.5/11]'
       )}
+      style={{
+        // Match the intrinsic behavior of the <img>
+        width: imageData?.width,
+        maxWidth: '100%',
+        maxHeight: '100%',
+        aspectRatio: imageData ? `${imageData.width} / ${imageData.height}` : undefined,
+      }}
       initial={{ scale: 1 }}
       whileHover={{ scale: 0.98 }}
       whileTap={{ scale: 0.9, transition: { duration: 0.2 } }}
@@ -117,9 +148,10 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
       onTouchEnd={onLongPressEnd}
       onTouchCancel={onLongPressEnd}
       onTouchMove={onLongPressEnd}
+      onKeyDown={onKeyDown}
     >
       {/* Checkbox */}
-      <div className={cn('absolute top-2 right-2', (inPreview || isLoading) && 'hidden')}>
+      <div className={cn('absolute top-2 right-2', isLoading && 'invisible')}>
         <CheckboxIcon isSelected={isSelected} />
       </div>
 
@@ -146,16 +178,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
         />
       )}
 
-      {/* Page number */}
-      <p
-        className={cn(
-          'absolute left-2 bottom-2 px-3 py-1 bg-white text-gray-500 rounded-full border',
-          'text-sm',
-          isLoading && 'hidden'
-        )}
-      >
-        Page {pageNumber}
-      </p>
+      <PageNumber pageNumber={pageNumber} hidden={isLoading} />
     </motion.div>
   )
 }
