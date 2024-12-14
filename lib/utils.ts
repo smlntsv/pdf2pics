@@ -40,7 +40,7 @@ export function downloadBlob(blob: Blob, fileName: string): void {
   link.href = url
   link.download = fileName
   link.click()
-  URL.revokeObjectURL(url) // Clean up the object URL
+  URL.revokeObjectURL(url)
 }
 
 export function renderPage(pageNumber: number, scale: number): Promise<PDFImageData> {

@@ -21,7 +21,7 @@ const Toolbar: FC = () => {
       <div
         className={cn(
           'flex justify-between items-center rounded-lg',
-          'bg-white dark:bg-gray-500 dark:text-white',
+          'bg-white dark:bg-slate-600 dark:text-white',
           'border border-gray-200  dark:border-gray-500',
           'text-sm'
         )}

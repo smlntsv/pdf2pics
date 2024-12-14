@@ -125,7 +125,13 @@ class PDFWorkerPool {
     return await Promise.all(promises)
   }
 
-  // Enqueue new task
+  /**
+   * Render page
+   * @param pageNumber
+   * @param scale
+   * @param format
+   * @param quality
+   */
   renderPage(
     pageNumber: number,
     scale: number = 1,

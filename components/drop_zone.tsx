@@ -12,7 +12,7 @@ interface Props {
 }
 
 const DropZone: FC<Props> = ({ className }) => {
-  const [isLoading, setIsLoading] = useState<boolean>()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const initializePdfWorkerPool = usePdfStore((state) => state.initializePdfWorkerPool)
 
   const onFileSelected = useCallback(
@@ -68,12 +68,13 @@ const DropZone: FC<Props> = ({ className }) => {
       {/* Loading Icon */}
       <div
         className={cn(
-          'absolute w-full h-full rounded-lg backdrop-blur',
-          'flex flex-col items-center justify-center text-slate-500 dark:text-slate-200',
+          'absolute inset-0 rounded-lg backdrop-blur',
+          'flex flex-col items-center justify-center ',
+          'text-slate-500 dark:text-slate-200',
           !isLoading && 'hidden'
         )}
       >
-        <LoaderCircle className={' animate-spin text-blue-400 w-[32px] h-[32px]'} />
+        <LoaderCircle className={'animate-spin text-blue-400 w-[32px] h-[32px]'} />
         <span>Opening...</span>
       </div>
 
