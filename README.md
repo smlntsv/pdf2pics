@@ -1,4 +1,4 @@
-<div style="text-align: center">
+<div align="center">
    <img src="public/img/icons/icon-192x192.png" alt="PDF to Pics" width="192" height="192" />
    <h1>PDF to Pics</h1>
    <p>
