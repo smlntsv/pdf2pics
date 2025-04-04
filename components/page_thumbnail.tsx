@@ -25,7 +25,6 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   const inPreview = pageNumber === previewPageNumber
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [alreadyInLine, setAlreadyInLine] = useState<boolean>(false)
   const [imageData, setImageData] = useState<PDFImageData | null>(null)
   const isLoading = !imageData
 
@@ -72,7 +71,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!alreadyInLine && entry.isIntersecting) {
+        if (entry.isIntersecting) {
           renderPage(pageNumber, lowResScale)
             .then((imageData) => setImageData(imageData))
             .catch((error) => {
@@ -83,7 +82,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
               })
               console.error(error)
             })
-          setAlreadyInLine(true)
+          observer.disconnect()
         }
       },
       { threshold: 0.1 }
@@ -94,7 +93,7 @@ const PageThumbnail: FC<Props> = ({ pageNumber, onClick }) => {
     }
 
     return () => observer.disconnect()
-  }, [pageNumber, alreadyInLine, pdfWorkerPool, lowResScale])
+  }, [pageNumber, pdfWorkerPool, lowResScale])
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
